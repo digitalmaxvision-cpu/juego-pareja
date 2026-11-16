@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Juego de Pareja</title>
+<meta name="description" content="Preguntas, retos y risas para jugar en pareja.">
+<meta name="theme-color" content="#2B2438">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --tinta:#2B2438; --terracota:#C8553D; --rubor:#F2C6B4; --crema:#FBF5EE;
+  --salvia:#8AA39B; --ocre:#E3A857; --ciruela:#6B4E71; --vino:#8E2A3A; --rosa:#E5677D;
+  --bg:#FBF2EE; --card:#FFFFFF; --text:#2B2438; --muted:#6E6577; --line:#EED9D0;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#1D1823; --card:#2B2438; --text:#FBF5EE; --muted:#C2B7CB; --line:#433852; }
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--text);font:16px/1.5 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  display:flex;justify-content:center;min-height:100dvh;overflow-x:hidden;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cpath d='M32 46s-11-6.6-11-14a6 6 0 0 1 11-3.4A6 6 0 0 1 43 32c0 7.4-11 14-11 14z' fill='%23E5677D' fill-opacity='.07'/%3E%3C/svg%3E");}
+.app{width:100%;max-width:480px;padding:18px 16px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column;min-height:100dvh;position:relative}
+h1,h2{font-family:Fraunces,Georgia,serif;font-weight:600;letter-spacing:-.01em}
+h1{font-size:36px;line-height:1.04}
+h2{font-size:26px;line-height:1.15}
+.kicker{font:700 11px Inter,sans-serif;letter-spacing:.25em;text-transform:uppercase;color:var(--terracota)}
+.muted{color:var(--muted)}
+.screen{display:none;flex:1;flex-direction:column;gap:16px;animation:fade .35s ease}
+.screen.on{display:flex}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+button{font:inherit;cursor:pointer;border:0}
+
+/* portada */
+.hero{border-radius:28px;min-height:58vh;padding:26px 22px;color:#fff;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;
+  background:linear-gradient(180deg,rgba(43,36,56,.05) 25%,rgba(43,36,56,.92) 82%),url(img/portada.jpg) center 30%/cover, var(--tinta);
+  box-shadow:0 24px 50px -24px rgba(142,42,58,.6)}
+.hero h1{margin:6px 0 8px}
+.hero p{color:var(--rubor);max-width:92%}
+.hero .kicker{color:var(--ocre)}
+.floaters{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.floaters i{position:absolute;bottom:-30px;width:18px;height:18px;opacity:0;animation:rise 9s linear infinite}
+.floaters i svg{width:100%;height:100%;fill:#F2C6B4}
+@keyframes rise{0%{transform:translateY(0) rotate(-10deg);opacity:0}10%{opacity:.85}100%{transform:translateY(-70vh) rotate(15deg);opacity:0}}
+.sub{font-weight:700;font-size:15px;text-align:center;margin-top:4px}
+.duos{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.duo{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:14px 6px;text-align:center;color:var(--text);transition:transform .12s,border-color .12s}
+.duo:active{transform:scale(.96)}
+.duo.on{border-color:var(--rosa);background:linear-gradient(160deg,#FFF0F2,var(--card))}
+@media (prefers-color-scheme: dark){.duo.on{background:linear-gradient(160deg,#4A2B3A,var(--card))}}
+.duo .e{font-size:34px;display:block;line-height:1.2}
+.duo b{font-size:14px;display:block;margin-top:4px}
+.btn{padding:16px 18px;border-radius:18px;font-weight:700;font-size:16px;background:linear-gradient(135deg,var(--rosa),var(--terracota));color:#fff;width:100%;
+  box-shadow:0 10px 24px -12px rgba(200,85,61,.8);transition:transform .1s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.45;box-shadow:none}
+.btn.sec{background:var(--card);color:var(--text);border:2px solid var(--line);box-shadow:none}
+.btn.ok{background:linear-gradient(135deg,#4FA37F,#2F7A5A);box-shadow:0 10px 24px -12px rgba(47,122,90,.8)}
+.btn.no{background:linear-gradient(135deg,#8A6A90,var(--ciruela));box-shadow:none}
+.hico{width:18px;height:18px;fill:currentColor;flex:none}
+
+/* menu */
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.back{background:none;color:var(--muted);font-weight:600;font-size:15px;padding:6px 0}
+.pill{font:700 12px Inter;padding:7px 12px;border-radius:99px;background:var(--card);border:1px solid var(--line);color:var(--muted);display:inline-flex;gap:6px;align-items:center}
+.pill .hico{width:14px;height:14px;fill:var(--rosa)}
+.modes{display:grid;grid-template-columns:1fr;gap:14px}
+.mode{display:block;padding:0;border-radius:22px;overflow:hidden;background:var(--card);box-shadow:0 14px 30px -18px rgba(43,36,56,.7);transition:transform .12s}
+.mode:active{transform:scale(.97)}
+.mode img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+.howto{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:16px 18px}
+.howto ol{padding-left:20px;display:grid;gap:5px;font-size:15px}
+
+/* cartas */
+.card{flex:1;min-height:320px;border-radius:30px;padding:26px 24px;display:flex;flex-direction:column;justify-content:space-between;
+  color:#fff;box-shadow:0 22px 44px -22px rgba(43,36,56,.65);position:relative;overflow:hidden}
+.card .wm{position:absolute;right:-38px;bottom:-30px;width:190px;height:190px;fill:rgba(255,255,255,.1);pointer-events:none}
+.card .wm2{position:absolute;left:-20px;top:-26px;width:90px;height:90px;fill:rgba(255,255,255,.08);pointer-events:none}
+.card .q{font-family:Fraunces,serif;font-size:27px;line-height:1.22;margin:18px 0;position:relative}
+.card .who{font:700 12px Inter;letter-spacing:.18em;text-transform:uppercase;display:flex;align-items:center;gap:8px;position:relative}
+.card .who .dot{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:15px;letter-spacing:0}
+.card .hint{font-size:14px;opacity:.88;position:relative}
+.flip{animation:flip .5s cubic-bezier(.2,.8,.3,1.2)}
+@keyframes flip{from{opacity:0;transform:perspective(800px) rotateY(75deg) scale(.94)}to{opacity:1;transform:none}}
+.score{display:flex;gap:10px}
+.score div{flex:1;padding:10px 12px;border-radius:18px;background:var(--card);border:2px solid var(--line);display:flex;align-items:center;gap:10px}
+.score div.act{border-color:var(--rosa);box-shadow:0 0 0 4px rgba(229,103,125,.15)}
+.score .hh{position:relative;width:44px;height:40px;flex:none}
+.score .hh svg{width:100%;height:100%;fill:var(--rosa)}
+.score .hh b{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font:700 16px Inter;padding-bottom:3px}
+.score small{font-weight:700;font-size:14px;line-height:1.2}
+.cats{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:9px 14px;border-radius:99px;font-weight:600;font-size:14px;background:var(--card);border:2px solid var(--line);color:var(--text)}
+.chip.on{background:var(--tinta);color:#fff;border-color:var(--tinta)}
+@media (prefers-color-scheme: dark){.chip.on{background:var(--rosa);border-color:var(--rosa)}}
+.progress{display:flex;gap:4px}
+.progress i{flex:1;height:6px;border-radius:9px;background:var(--line)}
+.progress i.done{background:var(--rosa)}
+.row{display:flex;gap:10px}
+.row>*{flex:1}
+
+/* resultado */
+.result{justify-content:center}
+.res-photo{border-radius:28px;min-height:300px;padding:24px;display:flex;flex-direction:column;justify-content:flex-end;color:#fff;position:relative;overflow:hidden;
+  background:linear-gradient(180deg,rgba(43,36,56,0) 20%,rgba(43,36,56,.94) 85%),url(img/final.jpg) center 35%/cover,var(--tinta)}
+.big{font-family:Fraunces,serif;font-size:60px;line-height:1;color:var(--rubor)}
+.res-photo h2{color:#fff;margin:6px 0}
+.res-photo p{color:#F7E1D8;font-size:15px}
+.foot{text-align:center;font-size:12px;color:var(--muted);margin-top:auto;padding-top:14px}
+.heart{position:fixed;pointer-events:none;width:28px;height:28px;animation:up 1.5s ease-out forwards;z-index:9}
+.heart svg{width:100%;height:100%}
+@keyframes up{0%{transform:translateY(0) scale(.6);opacity:1}100%{transform:translateY(-55vh) scale(1.4) rotate(20deg);opacity:0}}
+@media (prefers-reduced-motion: reduce){.floaters,.heart{display:none}.flip,.screen{animation:none}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="h" viewBox="0 0 24 24"><path d="M12 21.3s-7.6-4.7-9.6-9.2C.9 8.7 3 5 6.6 5c2.1 0 3.6 1.2 5.4 3.2C13.8 6.2 15.3 5 17.4 5 21 5 23.1 8.7 21.6 12.1 19.6 16.6 12 21.3 12 21.3z"/></symbol>
+</svg>
+<div class="app">
+
+  <!-- INICIO -->
+  <section class="screen on" id="s-inicio">
+    <div class="hero">
+      <div class="floaters" id="floaters"></div>
+      <div class="kicker">Juego de pareja</div>
+      <h1>¿Cuánto nos conocemos?</h1>
+      <p>Preguntas, risas y pequeños retos para jugar los dos y volver a mirarse con curiosidad.</p>
+    </div>
+    <div class="sub">¿Quiénes juegan hoy?</div>
+    <div class="duos" id="duos">
+      <button class="duo" data-duo="mf"><span class="e">👩‍❤️‍👨</span><b>Él y ella</b></button>
+      <button class="duo" data-duo="mm"><span class="e">👨‍❤️‍👨</span><b>Él y él</b></button>
+      <button class="duo" data-duo="ff"><span class="e">👩‍❤️‍👩</span><b>Ella y ella</b></button>
+    </div>
+    <button class="btn" id="b-empezar" disabled><svg class="hico"><use href="#h"/></svg>Empezar a jugar</button>
+    <div class="foot">Bono del kit «Para dejar de pelear por lo mismo y reencontrarse en pareja»</div>
+  </section>
+
+  <!-- MENU -->
+  <section class="screen" id="s-menu">
+    <div class="top"><button class="back" data-go="inicio">← Cambiar pareja</button><span class="pill" id="pareja"></span></div>
+    <h2>¿A qué jugamos?</h2>
+    <div class="modes">
+      <button class="mode" data-mode="conoces" aria-label="¿Cuánto me conoces? Adivinen y sumen corazones. 10 rondas."><img src="img/menu-conoces.jpg" alt="¿Cuánto me conoces? Adivinen y sumen corazones. 10 rondas."></button>
+      <button class="mode" data-mode="charlas" aria-label="Cartas para charlar. Para reír, recordar y soñar."><img src="img/menu-charlas.jpg" alt="Cartas para charlar. Para reír, recordar y soñar."></button>
+      <button class="mode" data-mode="retos" aria-label="Retos de pareja. Desafíos tiernos y divertidos."><img src="img/menu-retos.jpg" alt="Retos de pareja. Desafíos tiernos y divertidos."></button>
+      <button class="mode" data-mode="este" aria-label="¿Quién es más...? Señalen a la vez y vean si coinciden."><img src="img/menu-este.jpg" alt="¿Quién es más...? Señalen a la vez y vean si coinciden."></button>
+    </div>
+    <div class="howto">
+      <div class="kicker" style="margin-bottom:8px">Reglas de oro</div>
+      <ol>
+        <li>Nadie tiene razón: es un juego, no un examen.</li>
+        <li>Si una pregunta incomoda, se pasa sin explicar.</li>
+        <li>Escuchen la respuesta del otro hasta el final.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ¿CUANTO ME CONOCES? -->
+  <section class="screen" id="s-conoces">
+    <div class="top"><button class="back" data-go="menu">← Menú</button><span class="pill" id="c-ronda"></span></div>
+    <div class="progress" id="c-prog"></div>
+    <div class="score">
+      <div id="c-s1"><span class="hh"><svg><use href="#h"/></svg><b>0</b></span><small></small></div>
+      <div id="c-s2"><span class="hh"><svg><use href="#h"/></svg><b>0</b></span><small></small></div>
+    </div>
+    <div class="card" id="c-card" style="background:linear-gradient(150deg,#E5677D,#C8553D 55%,#8E2A3A)">
+      <svg class="wm"><use href="#h"/></svg><svg class="wm2"><use href="#h"/></svg>
+      <div class="who" id="c-who"></div>
+      <div class="q" id="c-q"></div>
+      <div class="hint" id="c-hint"></div>
+    </div>
+    <div class="row">
+      <button class="btn no" id="c-no">No acertó</button>
+      <button class="btn ok" id="c-si"><svg class="hico"><use href="#h"/></svg>¡Acertó!</button>
+    </div>
+  </section>
+
+  <!-- CHARLAS -->
+  <section class="screen" id="s-charlas">
+    <div class="top"><button class="back" data-go="menu">← Menú</button><span class="pill" id="h-cont"></span></div>
+    <div class="cats" id="h-cats"></div>
+    <div class="card" id="h-card" style="background:linear-gradient(150deg,#2B2438,#6B4E71 60%,#8E2A3A)">
+      <svg class="wm"><use href="#h"/></svg><svg class="wm2"><use href="#h"/></svg>
+      <div class="who" id="h-who"></div>
+      <div class="q" id="h-q"></div>
+      <div class="hint" id="h-cat"></div>
+    </div>
+    <button class="btn" id="h-next">Siguiente carta →</button>
+  </section>
+
+  <!-- RETOS -->
+  <section class="screen" id="s-retos">
+    <div class="top"><button class="back" data-go="menu">← Menú</button><span class="pill" id="r-cor"></span></div>
+    <div class="card" id="r-card" style="background:linear-gradient(150deg,#E3A857,#E5677D 60%,#C8553D)">
+      <svg class="wm"><use href="#h"/></svg><svg class="wm2"><use href="#h"/></svg>
+      <div class="who" id="r-who"></div>
+      <div class="q" id="r-q"></div>
+      <div class="hint">Si lo cumple, suman un corazón entre los dos.</div>
+    </div>
+    <div class="row">
+      <button class="btn sec" id="r-pasar">Pasar</button>
+      <button class="btn ok" id="r-hecho"><svg class="hico"><use href="#h"/></svg>¡Hecho!</button>
+    </div>
+  </section>
+
+  <!-- QUIEN ES MAS -->
+  <section class="screen" id="s-este">
+    <div class="top"><button class="back" data-go="menu">← Menú</button><span class="pill" id="e-coin"></span></div>
+    <div class="card" id="e-card" style="background:linear-gradient(150deg,#8AA39B,#4E6E72 50%,#2B2438)">
+      <svg class="wm"><use href="#h"/></svg><svg class="wm2"><use href="#h"/></svg>
+      <div class="who"><span class="dot">👉</span>Cuenten 3, 2, 1... ¡y señalen!</div>
+      <div class="q" id="e-q"></div>
+      <div class="hint">¿Señalaron a la misma persona?</div>
+    </div>
+    <div class="row">
+      <button class="btn sec" id="e-no">Distinto 😅</button>
+      <button class="btn ok" id="e-si"><svg class="hico"><use href="#h"/></svg>¡Coincidimos!</button>
+    </div>
+  </section>
+
+  <!-- RESULTADO -->
+  <section class="screen result" id="s-result">
+    <div class="res-photo">
+      <div class="kicker" style="color:var(--ocre)">Fin de la partida</div>
+      <div class="big" id="res-big"></div>
+      <h2 id="res-tit"></h2>
+      <p id="res-txt"></p>
+    </div>
+    <button class="btn" id="res-otra"><svg class="hico"><use href="#h"/></svg>Jugar otra vez</button>
+    <button class="btn sec" data-go="menu">Volver al menú</button>
+  </section>
+
+</div>
+<script>
+(function(){
+"use strict";
+
+/* =========================================================
+   Plantillas
+   {A} {B}        jugador (en minúscula: "él", "ella", "él ☀️")
+   {A:x|y}        x si A es él, y si es ella  (igual con B y R)
+   {R:x|y}        según quien responde la carta
+   {J:x|y}        y solo si son dos ellas (juntos/juntas)
+   {E:x|y}        x si son dos él, y si son dos ellas, "x o y" si es mixta
+   ========================================================= */
+const CONOCES = [
+  "¿Cuál es la comida favorita de {A}?",
+  "¿Qué haría {A} con un día libre sin obligaciones?",
+  "¿Cuál es la película o serie que {A} vería mil veces?",
+  "¿Qué le da más miedo a {A}?",
+  "¿Cuál es el lugar del mundo que {A} más quiere conocer?",
+  "¿Qué canción canta {A} cuando cree que nadie escucha?",
+  "¿Cuál es el postre que {A} nunca rechazaría?",
+  "¿Qué es lo primero que hace {A} al despertarse?",
+  "¿Cuál fue el mejor regalo que recibió {A}?",
+  "¿Qué le molesta muchísimo a {A}?",
+  "¿Qué quería ser {A} de {A:niño|niña}?",
+  "¿Qué superpoder elegiría {A}?",
+  "¿Cuál es el recuerdo favorito de {A} con {B}?",
+  "¿Qué le saca una sonrisa a {A} aunque tenga un mal día?",
+  "¿Qué animal sería {A} si pudiera elegir?",
+  "¿Cuál es el plan de fin de semana ideal para {A}?",
+  "¿Qué le cuesta más a {A}: pedir perdón o pedir ayuda?",
+  "¿Qué bebida pide {A} cuando sale?",
+  "¿Cuál es la manía más rara de {A}?",
+  "¿Qué es lo que más valora {A} en una amistad?",
+  "¿Qué estación del año prefiere {A}?",
+  "¿Qué haría {A} si ganara la lotería?",
+  "¿Con qué gesto de {B} se siente más {A:querido|querida} {A}?",
+  "¿Cuál es el talento escondido de {A}?",
+  "¿Qué le gustaría aprender a {A} este año?",
+  "¿Qué personaje famoso le cae mejor a {A}?",
+  "¿Cuál es la palabra o frase que más repite {A}?",
+  "¿Qué fue lo primero que le gustó a {A} de {B}?",
+  "¿A qué hora tiene más energía {A}: mañana, tarde o noche?",
+  "¿Qué le pondría {A} sí o sí a una pizza?",
+  "¿Cuál es la mayor travesura que hizo {A} de {A:niño|niña}?",
+  "¿Qué profesión habría elegido {A} en otra vida?",
+  "¿Qué olor le recuerda a {A} su infancia?",
+  "¿Qué es lo que más le preocupa a {A} últimamente?",
+  "¿Cuál es el apodo cariñoso favorito de {A}?",
+  "¿Qué haría {A} en una noche de lluvia perfecta?"
+];
+
+const CHARLAS = {
+  "Para reír": [
+    "¿Cuál es la situación más vergonzosa que vivimos {J:juntos|juntas}?",
+    "Si nuestra relación fuera una película, ¿qué título tendría?",
+    "¿Qué hábito mío imitarías en una obra de teatro?",
+    "¿Cuál fue nuestra cita más desastrosa?",
+    "Si tuviéramos un programa de cocina, ¿cómo se llamaría?",
+    "¿Qué canción sería el himno de nuestra pareja?",
+    "¿Qué locura haríamos si nadie nos viera?",
+    "¿Qué mascota nos representaría como pareja?",
+    "¿Cuál es la discusión más absurda que tuvimos?",
+    "Si pudieras cambiarme el nombre por un día, ¿cuál me pondrías?"
+  ],
+  "Recuerdos": [
+    "¿Qué recuerdas de la primera vez que nos vimos?",
+    "¿Cuándo supiste que te gustaba de verdad?",
+    "¿Cuál es tu foto favorita de {J:nosotros|nosotras} y por qué?",
+    "¿Qué momento difícil superamos {J:juntos|juntas} que te hace sentir {R:orgulloso|orgullosa}?",
+    "¿Cuál fue el mejor viaje o salida que hicimos?",
+    "¿Qué hacíamos al principio que te gustaría volver a hacer?",
+    "¿Qué canción te recuerda a {J:nosotros|nosotras}?",
+    "¿Cuál fue el día más divertido que pasamos {J:juntos|juntas}?",
+    "¿Qué aprendiste de mí en este tiempo?",
+    "¿Qué detalle mío te enamoró sin que yo lo supiera?"
+  ],
+  "Para conocernos": [
+    "¿Qué te tiene {R:preocupado|preocupada} en estos días?",
+    "¿Qué te hizo feliz esta semana?",
+    "¿Qué te gustaría que la gente supiera de ti?",
+    "¿De qué estás {R:orgulloso|orgullosa} de ti?",
+    "¿Cuándo te sientes más {R:querido|querida} por mí?",
+    "¿Qué podría hacer yo para que tu semana sea más fácil?",
+    "¿Qué admiras de mí?",
+    "¿Hay algo que nunca me dijiste y te gustaría decirme?",
+    "¿Qué necesitas más de mí en esta etapa?",
+    "¿Qué te da paz cuando el día viene complicado?"
+  ],
+  "Para soñar": [
+    "Si pudiéramos vivir un año en cualquier lugar del mundo, ¿dónde sería?",
+    "¿Qué aventura te gustaría que viviéramos {J:juntos|juntas}?",
+    "¿Cómo te imaginas que vamos a estar en diez años?",
+    "¿Qué tradición te gustaría que tuviéramos?",
+    "¿Qué proyecto te gustaría empezar conmigo?",
+    "¿Cómo sería nuestro domingo perfecto?",
+    "¿Qué te gustaría celebrar el año que viene?",
+    "Si ganáramos un premio, ¿qué haríamos primero?",
+    "¿Qué lugar te gustaría que conociéramos {J:juntos|juntas}?",
+    "¿Qué deseo tienes para {J:nosotros|nosotras} esta noche?"
+  ]
+};
+
+const RETOS = [
+  "Dale a {B} un abrazo de 20 segundos sin hablar.",
+  "Dile a {B} tres cosas que admiras de su forma de ser.",
+  "Haz tu mejor imitación de {B} recién despertando. Que {B} te califique del 1 al 10.",
+  "Cuéntale a {B} el momento exacto en que te gustó.",
+  "Cántale a {B} el estribillo de «su» canción.",
+  "Mírense a los ojos 30 segundos sin reírse.",
+  "Dale a {B} un masaje de hombros de un minuto.",
+  "Explica cómo es {B} en tres palabras... solo con mímica.",
+  "Planeen ahora mismo una cita para esta semana: día y lugar.",
+  "Bailen {J:juntos|juntas} una canción lenta, aunque sea en la cocina.",
+  "Escríbele a {B} un mensaje cariñoso y mándaselo ahora, aunque esté al lado.",
+  "Dale a {B} las gracias por algo concreto que hizo esta semana.",
+  "Recrea el primer saludo que le diste a {B}.",
+  "Prepárale a {B} su bebida favorita (o prométele hacerlo mañana).",
+  "Sáquense una selfie con la cara más graciosa posible.",
+  "Dile a {B} qué es lo que más extrañas cuando no están {J:juntos|juntas}.",
+  "Hazle a {B} un cumplido sobre algo que no sea físico.",
+  "Cuéntale a {B} un sueño que todavía no le contaste.",
+  "Den una vuelta {J:tomados|tomadas} de la mano, aunque sea por la casa.",
+  "Inventen un saludo secreto de pareja.",
+  "Dile a {B} qué canción le dedicarías hoy y por qué.",
+  "Elijan una foto vieja y cuenten qué estaba pasando ese día.",
+  "Durante el próximo minuto, solo pueden hablarse susurrando.",
+  "Dale a {B} un beso en la frente y dile algo que le dé tranquilidad.",
+  "Propón un plan que nunca hayan hecho {J:juntos|juntas}.",
+  "Dile a {B} qué es lo que más te hace reír de su forma de ser.",
+  "Hagan una lista de 3 cosas que quieren hacer antes de fin de año.",
+  "Pídele perdón a {B} por algo pequeño que quedó pendiente.",
+  "Hazle a {B} la mejor reverencia de {B:príncipe|princesa} que puedas.",
+  "Cuéntale a {B} tu recuerdo favorito de este año {J:juntos|juntas}."
+];
+
+const ESTE = [
+  "¿Quién es más probable que llegue tarde?",
+  "¿Quién se ríe más de sus propios chistes?",
+  "¿Quién pide perdón primero?",
+  "¿Quién se duerme primero viendo una película?",
+  "¿Quién es más {E:romántico|romántica}?",
+  "¿Quién cocina mejor?",
+  "¿Quién se pierde más seguido?",
+  "¿Quién gasta más en antojos?",
+  "¿Quién es más {E:ordenado|ordenada}?",
+  "¿Quién canta más fuerte en el carro?",
+  "¿Quién tiene más paciencia?",
+  "¿Quién manda en el control de la tele?",
+  "¿Quién llora más con las películas?",
+  "¿Quién planea las salidas?",
+  "¿Quién se enoja más rápido... y se le pasa más rápido?",
+  "¿Quién es más {E:competitivo|competitiva}?",
+  "¿Quién tarda más en arreglarse?",
+  "¿Quién recuerda mejor las fechas importantes?",
+  "¿Quién es más {E:friolento|friolenta}?",
+  "¿Quién dijo «te quiero» primero?",
+  "¿Quién sobreviviría más días en una isla desierta?",
+  "¿Quién se come el último pedazo sin preguntar?",
+  "¿Quién es más {E:dormilón|dormilona}?",
+  "¿Quién tiene la risa más contagiosa?",
+  "¿Quién sería la estrella de la pista en una fiesta?"
+];
+
+/* =========================================================
+   Parejas
+   ========================================================= */
+const DUOS = {
+  mf: [{ g: "m", t: "él", e: "💙" }, { g: "f", t: "ella", e: "💗" }],
+  mm: [{ g: "m", t: "él", e: "☀️" }, { g: "m", t: "él", e: "⭐" }],
+  ff: [{ g: "f", t: "ella", e: "☀️" }, { g: "f", t: "ella", e: "⭐" }]
+};
+const $ = (id) => document.getElementById(id);
+const st = { duo: null, p: null };
+const guardar = (k, v) => { try { localStorage.setItem("jp-" + k, JSON.stringify(v)); } catch (e) {} };
+const leer = (k, d) => { try { const v = localStorage.getItem("jp-" + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
+const mezclar = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const mayus = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+// nombre dentro de una frase: "él ☀️" (en pareja mixta sin emoji, se entiende solo)
+const nom = (p) => st.duo === "mf" ? p.t : p.t + " " + p.e;
+// nombre suelto, en títulos: "Él ☀️" / "Ella 💗"
+const titulo = (p) => mayus(p.t) + " " + p.e;
+
+function llenar(txt, a, b, r) {
+  const P = { A: a, B: b, R: r || a };
+  txt = txt.replace(/\{([ABR]):([^|}]*)\|([^}]*)\}/g, (_, k, x, y) => (P[k].g === "m" ? x : y));
+  txt = txt.replace(/\{J:([^|}]*)\|([^}]*)\}/g, (_, x, y) => (st.duo === "ff" ? y : x));
+  txt = txt.replace(/\{E:([^|}]*)\|([^}]*)\}/g, (_, x, y) => (st.duo === "mm" ? x : st.duo === "ff" ? y : x + " o " + y));
+  txt = txt.replace(/\{([AB])\}/g, (_, k) => nom(P[k]));
+  // mayúscula al inicio y después de punto
+  return txt.replace(/(^|(?<!\.)[.!?]\s+)([a-záéíóú])/g, (_, p, c) => p + c.toUpperCase());
+}
+
+/* =========================================================
+   Efectos
+   ========================================================= */
+const HEART = '<svg viewBox="0 0 24 24"><use href="#h"/></svg>';
+function ir(nombre) {
+  document.querySelectorAll(".screen").forEach((s) => s.classList.remove("on"));
+  $("s-" + nombre).classList.add("on");
+  window.scrollTo(0, 0);
+}
+function voltear(el) { el.classList.remove("flip"); void el.offsetWidth; el.classList.add("flip"); }
+function corazones(n) {
+  const colores = ["#E5677D", "#C8553D", "#F2C6B4", "#E3A857"];
+  for (let i = 0; i < n; i++) {
+    const h = document.createElement("div");
+    h.className = "heart"; h.innerHTML = HEART;
+    h.firstChild.style.fill = colores[i % colores.length];
+    h.style.left = (8 + Math.random() * 84) + "vw"; h.style.top = (55 + Math.random() * 35) + "vh";
+    h.style.animationDelay = (i * 0.06) + "s";
+    document.body.appendChild(h); setTimeout(() => h.remove(), 2000);
+  }
+}
+(function flotantes() {
+  const cont = $("floaters");
+  for (let i = 0; i < 12; i++) {
+    const h = document.createElement("i");
+    h.innerHTML = HEART;
+    const s = 10 + Math.random() * 16;
+    h.style.cssText = "left:" + (Math.random() * 100) + "%;width:" + s + "px;height:" + s + "px;animation-delay:" + (Math.random() * 9) + "s;animation-duration:" + (7 + Math.random() * 5) + "s";
+    cont.appendChild(h);
+  }
+})();
+
+/* =========================================================
+   Inicio
+   ========================================================= */
+function elegirDuo(d) {
+  st.duo = d; st.p = DUOS[d];
+  document.querySelectorAll(".duo").forEach((b) => b.classList.toggle("on", b.dataset.duo === d));
+  $("b-empezar").disabled = false;
+}
+document.querySelectorAll(".duo").forEach((b) => b.onclick = () => elegirDuo(b.dataset.duo));
+const previo = leer("duo", null);
+if (previo && DUOS[previo]) elegirDuo(previo);
+$("b-empezar").onclick = () => {
+  if (!st.duo) return;
+  guardar("duo", st.duo);
+  $("pareja").innerHTML = '<svg class="hico"><use href="#h"/></svg>' + titulo(st.p[0]) + " &amp; " + titulo(st.p[1]);
+  ir("menu");
+};
+document.querySelectorAll("[data-go]").forEach((b) => b.onclick = () => ir(b.dataset.go));
+document.querySelectorAll("[data-mode]").forEach((b) => b.onclick = () => arrancar[b.dataset.mode]());
+let ultimo = "conoces";
+
+/* =========================================================
+   ¿Cuánto me conoces?
+   ========================================================= */
+const C = { rondas: 10, i: 0, pts: [0, 0], mazo: [] };
+function cMostrar() {
+  const adivina = C.i % 2, responde = 1 - adivina;
+  const a = st.p[responde], b = st.p[adivina];
+  $("c-ronda").textContent = "Ronda " + (C.i + 1) + " de " + C.rondas;
+  $("c-prog").innerHTML = Array.from({ length: C.rondas }, (_, k) => '<i class="' + (k < C.i ? "done" : "") + '"></i>').join("");
+  $("c-who").innerHTML = '<span class="dot">' + b.e + "</span>Adivina " + b.t;
+  $("c-q").textContent = llenar(C.mazo[C.i], a, b);
+  $("c-hint").textContent = mayus(nom(b)) + " responde en voz alta. " + mayus(nom(a)) + " dice si acertó.";
+  [0, 1].forEach((k) => {
+    const d = $("c-s" + (k + 1));
+    d.querySelector("small").textContent = titulo(st.p[k]);
+    d.querySelector("b").textContent = C.pts[k];
+    d.classList.toggle("act", k === adivina);
+  });
+  voltear($("c-card"));
+}
+function cResponder(acerto) {
+  const adivina = C.i % 2;
+  if (acerto) { C.pts[adivina]++; corazones(10); }
+  C.i++;
+  if (C.i >= C.rondas) return cFin();
+  cMostrar();
+}
+function cFin() {
+  const [p1, p2] = C.pts, tot = p1 + p2;
+  $("res-big").textContent = tot + " / " + C.rondas;
+  let tit, txt;
+  if (tot >= 8) { tit = "¡Se conocen de memoria!"; txt = "Son un equipo que se mira con atención. Sigan descubriéndose: las personas cambian y eso es lo lindo."; }
+  else if (tot >= 5) { tit = "¡Muy buen equipo!"; txt = "Se conocen bastante y todavía quedan sorpresas. Prueben las Cartas para charlar para descubrir más."; }
+  else { tit = "¡Hay mucho por descubrir!"; txt = "Nada de drama: es la excusa perfecta para hacerse más preguntas. La curiosidad también es una forma de amor."; }
+  if (p1 !== p2) txt += " Esta vez ganó " + titulo(p1 > p2 ? st.p[0] : st.p[1]) + " (" + Math.max(p1, p2) + " a " + Math.min(p1, p2) + ").";
+  else txt += " ¡Empataron " + p1 + " a " + p2 + "!";
+  $("res-tit").textContent = tit; $("res-txt").textContent = txt;
+  corazones(18); ir("result");
+}
+$("c-si").onclick = () => cResponder(true);
+$("c-no").onclick = () => cResponder(false);
+
+/* =========================================================
+   Cartas para charlar
+   ========================================================= */
+const H = { cat: "Todas", mazo: [], i: 0, turno: 0 };
+const catNombres = ["Todas"].concat(Object.keys(CHARLAS));
+function hMazo() {
+  const base = H.cat === "Todas" ? Object.entries(CHARLAS).flatMap(([c, qs]) => qs.map((q) => [c, q])) : CHARLAS[H.cat].map((q) => [H.cat, q]);
+  H.mazo = mezclar(base); H.i = 0;
+}
+function hCats() {
+  const cont = $("h-cats"); cont.innerHTML = "";
+  catNombres.forEach((c) => {
+    const b = document.createElement("button");
+    b.className = "chip" + (c === H.cat ? " on" : ""); b.textContent = c;
+    b.onclick = () => { H.cat = c; hCats(); hMazo(); hMostrar(); };
+    cont.appendChild(b);
+  });
+}
+function hMostrar() {
+  if (H.i >= H.mazo.length) hMazo();
+  const [cat, q] = H.mazo[H.i];
+  const r = st.p[H.turno], o = st.p[1 - H.turno];
+  $("h-who").innerHTML = '<span class="dot">' + r.e + "</span>Responde " + r.t;
+  $("h-q").textContent = llenar(q, r, o, r);
+  $("h-cat").textContent = cat + " · después responde " + nom(o);
+  $("h-cont").textContent = (H.i + 1) + " / " + H.mazo.length;
+  voltear($("h-card"));
+}
+$("h-next").onclick = () => { H.i++; H.turno = 1 - H.turno; hMostrar(); };
+
+/* =========================================================
+   Retos
+   ========================================================= */
+const R = { mazo: [], i: 0, turno: 0, cor: 0 };
+function rMostrar() {
+  if (R.i >= R.mazo.length) { R.mazo = mezclar(RETOS); R.i = 0; }
+  const a = st.p[R.turno], b = st.p[1 - R.turno];
+  $("r-who").innerHTML = '<span class="dot">' + a.e + "</span>Reto para " + a.t;
+  $("r-q").textContent = llenar(R.mazo[R.i], a, b, a);
+  $("r-cor").innerHTML = '<svg class="hico"><use href="#h"/></svg>' + R.cor + (R.cor === 1 ? " corazón" : " corazones");
+  voltear($("r-card"));
+}
+$("r-hecho").onclick = () => { R.cor++; corazones(10); R.i++; R.turno = 1 - R.turno; rMostrar(); };
+$("r-pasar").onclick = () => { R.i++; R.turno = 1 - R.turno; rMostrar(); };
+
+/* =========================================================
+   ¿Quién es más...?
+   ========================================================= */
+const E = { mazo: [], i: 0, coin: 0 };
+function eMostrar() {
+  if (E.i >= E.mazo.length) { E.mazo = mezclar(ESTE); E.i = 0; }
+  $("e-q").textContent = llenar(E.mazo[E.i], st.p[0], st.p[1]);
+  $("e-coin").innerHTML = '<svg class="hico"><use href="#h"/></svg>' + E.coin + (E.coin === 1 ? " coincidencia" : " coincidencias");
+  voltear($("e-card"));
+}
+$("e-si").onclick = () => { E.coin++; corazones(8); E.i++; eMostrar(); };
+$("e-no").onclick = () => { E.i++; eMostrar(); };
+
+/* =========================================================
+   Arranque
+   ========================================================= */
+const arrancar = {
+  conoces() { ultimo = "conoces"; C.i = 0; C.pts = [0, 0]; C.mazo = mezclar(CONOCES).slice(0, C.rondas); ir("conoces"); cMostrar(); },
+  charlas() { ultimo = "charlas"; H.turno = 0; hCats(); hMazo(); ir("charlas"); hMostrar(); },
+  retos() { ultimo = "retos"; R.mazo = mezclar(RETOS); R.i = 0; R.turno = 0; R.cor = 0; ir("retos"); rMostrar(); },
+  este() { ultimo = "este"; E.mazo = mezclar(ESTE); E.i = 0; E.coin = 0; ir("este"); eMostrar(); }
+};
+$("res-otra").onclick = () => arrancar[ultimo]();
+})();
+</script>
+</body>
+</html>
